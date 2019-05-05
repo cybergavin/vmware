@@ -1,0 +1,4 @@
+---
+new_vms:
+  - {name: voaktstpc70, ip: 192.168.23.198, gw: 192.168.23.1, nm: 255.255.255.0, nicpg: VLAN23, cpu: 2, mem: 2048, ds: doakibmsl01}
+  - {name: voaktstpc71, ip: 192.168.23.199, gw: 192.168.23.1, nm: 255.255.255.0, nicpg: VLAN23, cpu: 2, mem: 4096, ds: doakibmsl01}

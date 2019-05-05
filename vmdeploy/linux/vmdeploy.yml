@@ -1,0 +1,55 @@
+---
+#!/bin/bash
+## Author: mrkips - Cybergavin (http://mrgav.in)
+## v1.0 - 24th Feb 2019
+## This playbook enables RHEL VM provisioning on a VMware platform.
+## Tested with Ansible 2.7.7 and ESXi 6.7 
+##
+################################################################################################
+- name: Deploy and customize (basic) a Linux VM on VMware
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Include variables
+      include_vars: dir=vars
+    - name: Deploy Linux VM(s)
+      vmware_guest:
+        hostname: "{{ my_vsa }}"
+        username: "{{ my_vsa_username }}"
+        password: "{{ my_vsa_password }}"
+        validate_certs: "{{ my_validcerts }}"
+        datacenter: "{{ my_dc }}"
+        cluster: "{{ my_cluster }}"
+        template: "{{ my_linux_template }}"
+        folder: "{{ my_folder | default('/Management') }}"
+        state: poweredon
+        name: "{{ item.name }}"
+        hardware:
+          memory_mb: "{{ item.mem }}"
+          num_cpus: "{{ item.cpu }}"
+        datastore: "{{ item.ds }}"
+        networks:
+        - name: "{{ item.nicpg }}"
+          ip: "{{ item.ip }}"
+          netmask: "{{ item.nm }}"
+          gateway: "{{ item.gw }}"
+        wait_for_ip_address: True
+        customization:
+          domain: "{{ my_domain }}"
+          dns_servers: "{{ my_dns }}"
+          dns_suffix: "{{ my_domain }}"
+      with_items: "{{ new_vms }}"
+    - name: Join Linux VM(s) to the AD Domain 
+      vmware_vm_shell:
+        hostname: "{{ my_vsa }}"
+        username: "{{ my_vsa_username }}"
+        password: "{{ my_vsa_password }}"
+        validate_certs: "{{ my_validcerts }}"
+        vm_id: "{{ item.name }}"
+        vm_username: "{{ my_linux_username }}"
+        vm_password: "{{ my_linux_password }}"
+        vm_shell: "{{ my_script }}"
+        vm_shell_args: "-b {{ my_bind_user }} -p {{ my_bind_pass }}"
+        wait_for_process: True 
+      with_items: "{{ new_vms }}"

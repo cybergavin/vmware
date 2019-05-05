@@ -1,0 +1,20 @@
+---
+my_vsa: vsa.satlab
+my_esxi: soakesxsl01.satlab
+my_dc: OAKVILLE
+my_cluster: SATLAB
+my_validcerts: no
+my_folder: Ansible 
+my_script: "/opt/VMBuild/bin/joinDomain.sh"
+my_linux_template: rhel01
+my_dns: [192.168.23.10]
+my_domain: satlab.home
+# 
+# Variables defined in secrets.yml
+# 
+my_vsa_username: "{{ vault_my_vsa_username }}"
+my_vsa_password: "{{ vault_my_vsa_password }}"
+my_linux_username: "{{ vault_my_linux_username }}"
+my_linux_password: "{{ vault_my_linux_password }}"
+my_bind_user: "{{ vault_my_bind_user }}"
+my_bind_pass: "{{ vault_my_bind_pass }}"

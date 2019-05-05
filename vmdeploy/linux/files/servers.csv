@@ -1,0 +1,3 @@
+name,ip,net,nicpg,#cpu,mem(GB),datastore
+voaktstpc70,192.168.23.198,192.168.23.0/24,VLAN23,2,2,doakibmsl01
+voaktstpc71,192.168.23.199,192.168.23.0/24,VLAN23,2,4,doakibmsl01
