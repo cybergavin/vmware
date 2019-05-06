@@ -3,7 +3,7 @@
 ## Author: mrkips - Cybergavin (http://mrgav.in)
 ## v1.0 - 24th Feb 2019
 ## This playbook enables Windows VM provisioning on a VMware platform.
-## Tested with Ansible 2.7.7, 2.8rc2, Windows 2019 and ESXi 6.7 
+## Tested with Ansible 2.8rc2, Windows 2019 and ESXi 6.7 
 ##
 ################################################################################################
 - name: Deploy and customize (basic) a Windows VM on VMware
