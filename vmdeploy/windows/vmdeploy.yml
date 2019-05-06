@@ -1,0 +1,97 @@
+---
+#!/bin/bash
+## Author: mrkips - Cybergavin (http://mrgav.in)
+## v1.0 - 24th Feb 2019
+## This playbook enables Windows VM provisioning on a VMware platform.
+## Tested with Ansible 2.7.7, 2.8rc2, Windows 2019 and ESXi 6.7 
+##
+################################################################################################
+- name: Deploy and customize (basic) a Windows VM on VMware
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Include variables
+      include_vars: dir=vars
+    - name: Deploy Windows VM(s)
+      vmware_guest:
+        hostname: "{{ my_vsa }}"
+        username: "{{ my_vsa_username }}"
+        password: "{{ my_vsa_password }}"
+        validate_certs: "{{ my_validcerts }}"
+        datacenter: "{{ my_dc }}"
+        cluster: "{{ my_cluster }}"
+        template: "{{ my_windows_template }}"
+        folder: "{{ my_folder | default('/Management') }}"
+        state: poweredon
+        name: "{{ item.name }}"
+        hardware:
+          memory_mb: "{{ item.mem }}"
+          num_cpus: "{{ item.cpu }}"
+        datastore: "{{ item.ds }}"
+        networks:
+        - name: "{{ item.nicpg }}"
+          ip: "{{ item.ip }}"
+          netmask: "{{ item.nm }}"
+          gateway: "{{ item.gw }}"
+        wait_for_ip_address: yes 
+        customization:
+          autologon: yes
+          password: "{{ my_admin_password }}"
+          joindomain: "{{ my_domain }}"
+          domainadmin: "{{ my_bind_user }}"
+          domainadminpassword: "{{ my_bind_pass }}"
+          domain: "{{ my_domain }}"
+          dns_servers: "{{ my_dns }}"
+        wait_for_customization: yes 
+      with_items: "{{ new_vms }}"
+    - name: Add Disks to Windows VM(s) 
+      vmware_guest_disk:
+        datacenter: "{{ my_dc }}"
+        hostname: "{{ my_vsa }}"
+        username: "{{ my_vsa_username }}"
+        password: "{{ my_vsa_password }}"
+        validate_certs: "{{ my_validcerts }}"
+        name: "{{ item.name }}"
+        disk:
+        - size_gb: "{{ item.kd }}"
+          type: thin
+          datastore: "{{ item.ds }}" 
+          state: present
+          scsi_controller: 0
+          unit_number: 2
+          scsi_type: 'paravirtual'
+        - size_gb: "{{ item.ld }}"
+          type: thin 
+          state: present
+          datastore: "{{ item.ds }}" 
+          scsi_controller: 1
+          unit_number: 0
+          scsi_type: 'paravirtual'
+        - size_gb: "{{ item.sd }}"
+          type: eagerzeroedthick
+          state: present
+          datastore: "{{ item.ds }}" 
+          scsi_controller: 2
+          unit_number: 0
+          scsi_type: 'paravirtual'
+        - size_gb: "{{ item.td }}"
+          type: thick
+          state: present
+          datastore: "{{ item.ds }}" 
+          scsi_controller: 3
+          unit_number: 0
+          scsi_type: 'paravirtual'
+      with_items: "{{ new_vms }}"
+    - name: Create and format new volumes on Windows VM(s) 
+      vmware_vm_shell:
+        hostname: "{{ my_vsa }}"
+        username: "{{ my_vsa_username }}"
+        password: "{{ my_vsa_password }}"
+        validate_certs: "{{ my_validcerts }}"
+        vm_id: "{{ item.name }}"
+        vm_username: Administrator 
+        vm_password: "{{ my_admin_password }}"
+        vm_shell: "{{ my_script }}"
+        wait_for_process: True
+      with_items: "{{ new_vms }}"
