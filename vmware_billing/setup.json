@@ -1,0 +1,17 @@
+{
+    "config": {
+      "vcServers": ["vcenter-1.com", "vcenter-2.com"],
+      "data_directory_name": "data",
+      "excel_workbook_name": "Billing-Chargeback.xlsx"
+    },
+    "monthly_rates": {  
+      "cpu": "9",
+      "mem": "4",
+      "storage": "0.05",
+      "dataprotect": "0.1",
+      "managed": "125",
+      "mssql": "400",
+      "mysql": "250",
+      "oracle": "2000"
+    }
+}
